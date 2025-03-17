@@ -1,11 +1,18 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Weather } from '../types';
 
 	let cityQuery = $state('');
 	let weather: Weather | null = $state(null);
 	let isLoading = $state(false);
 	let error: string | null = $state(null);
+	let timer: number | undefined = $state(undefined);
+
+	const debounce = (v: string) => {
+		clearTimeout(timer);
+		timer = setTimeout(() => {
+			cityQuery = v;
+		}, 750);
+	};
 
 	const fetchWeather = async () => {
 		try {
@@ -39,7 +46,7 @@
 				type="text"
 				placeholder="Enter city name..."
 				class="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-				bind:value={cityQuery}
+				onkeyup={(e) => debounce((e.target as HTMLInputElement).value)}
 			/>
 			<button
 				class="rounded-lg bg-blue-500 px-4 py-2 text-white transition hover:bg-blue-600 disabled:cursor-wait disabled:opacity-30"
@@ -53,7 +60,11 @@
 		<!-- Weather Display -->
 		<div class="mt-6 rounded-lg bg-gray-50 p-4 text-center shadow">
 			{#if isLoading}
-				<span>Fetching weather...Please wait!</span>
+				<div class="flex flex-col items-center">
+					<div class="h-7 w-[200px] animate-pulse bg-gray-200"></div>
+					<div class="mt-2 h-10 w-[300px] animate-pulse bg-gray-200"></div>
+					<div class="mt-1 h-6 w-[150px] animate-pulse bg-gray-200"></div>
+				</div>
 			{:else if error}
 				<span>{error}</span>
 			{:else if weather}
