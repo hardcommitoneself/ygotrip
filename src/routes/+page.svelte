@@ -3,14 +3,19 @@
 
 	let cityQuery = $state('');
 	let weather: Weather | null = $state(null);
+	let isInputingQuery = $state(false);
 	let isLoading = $state(false);
 	let error: string | null = $state(null);
 	let timer: number | undefined = $state(undefined);
 
 	const debounce = (v: string) => {
+		isInputingQuery = true;
+
 		clearTimeout(timer);
+
 		timer = setTimeout(() => {
 			cityQuery = v;
+			isInputingQuery = false;
 		}, 750);
 	};
 
@@ -51,7 +56,7 @@
 			<button
 				class="rounded-lg bg-blue-500 px-4 py-2 text-white transition hover:bg-blue-600 disabled:cursor-wait disabled:opacity-30"
 				onclick={() => fetchWeather()}
-				disabled={isLoading}
+				disabled={isLoading || isInputingQuery}
 			>
 				{isLoading ? 'Wait...' : 'Search'}
 			</button>
